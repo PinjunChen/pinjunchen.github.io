@@ -3,70 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="The personal website of Pinjun Chen."
-    />
-    <meta name="theme-color" content="#fafafa" />
+    <meta name="description" content="The personal website of Pinjun Chen." />
+    <meta name="theme-color" content="#faf7f8" />
     <title>Pinjun Chen</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="canonical" href="https://pinjunchen.github.io/" />
+    <link rel="stylesheet" href="./styles.css?v=20261012" />
+    <script src="./current.js?v=20261012" defer></script>
   </head>
   <body>
-    <div class="page-shell">
-      <header class="site-header">
-        <nav class="site-nav" aria-label="Main navigation">
-          <a href="./" aria-current="page">Home</a>
-          <a href="./news/">News</a>
-          <a href="./misc/">Misc</a>
-        </nav>
-      </header>
-
-      <main class="home-page">
-        <h1>Pinjun Chen</h1>
-        <a class="email-button" href="mailto:chanpinjun@gmail.com">Email</a>
-
-        <div class="prose">
-          <p>
-            I’m currently an Algorithm Engineer based in Shanghai, China. I
-            received my master’s degree from
-            <a href="https://engineering.jhu.edu/">Johns Hopkins University</a>
-            and my bachelor’s degree from
-            <a href="https://hyxt.whu.edu.cn/index.htm">Wuhan University</a>.
-            My research centers on AI Security, with a particular interest in
-            trustworthy AI, especially fairness in AI.
-          </p>
-
-          <p>
-            Outside of work and research, I enjoy novels, films, JRPGs, and
-            Arknights. BTW, I love Chongqing noodles topped with a fried egg,
-            and I strongly recommend that everyone try it.
-          </p>
-
-          <p>
-            I also share my home with a cat named
-            <span class="cat-name" lang="zh-CN">紫米<span class="paw" aria-hidden="true">🐾</span></span>
-            (pronounced roughly “dzuh-mee”), whose name literally means “purple
-            rice.”
-          </p>
-
-          <p>
-            I create to give form to my emotions and, hopefully, resonate with
-            others. I’m currently developing an indie game on my own, hoping to
-            share some of those delicate feelings with others someday.
-          </p>
-
-          <p>
-            Feel free to reach out if you’d like to collaborate or have a
-            coffee chat about my work, research, game development—or even my
-            cat. :)
-          </p>
-        </div>
-
-        <blockquote lang="zh-CN">
-          “南淮是不是那个南淮都无所谓，可和你偷花跳板子打枣子的人，都已经不在了。”
-        </blockquote>
-      </main>
-
+<div id="pinjun-cut-current">
+  <div class="pc-site">
+    <canvas class="pc-ambient" aria-hidden="true"></canvas>
+    <button type="button" class="pc-art cursor-interaction" aria-label="播放 CHEN 图形动画" aria-pressed="false"></button>
+    <header class="pc-navigation">
+      <nav aria-label="Main navigation">
+        <a class="pc-nav cursor-interaction" href="./" aria-current="page">Home</a>
+        <a class="pc-nav cursor-interaction" href="./news/">News</a>
+        <a class="pc-nav cursor-interaction" href="./misc/">Misc</a>
+      </nav>
+    </header>
+    <div class="pc-heading">
+      <h1>Pinjun Chen</h1>
+      <a class="pc-email cursor-interaction" href="mailto:chanpinjun@gmail.com"><span class="pc-email-label">Email</span><span class="pc-email-arrow" aria-hidden="true">↗</span></a>
     </div>
+
+    <main class="pc-reading"><div class="pc-content"><p>I’m currently an Algorithm Engineer based in Shanghai, China. I received my master’s degree from <a href="https://engineering.jhu.edu/" target="_blank" rel="noopener noreferrer">Johns Hopkins University</a> and my bachelor’s degree from <a href="https://hyxt.whu.edu.cn/index.htm" target="_blank" rel="noopener noreferrer">Wuhan University</a>. My research centers on AI Security, with a particular interest in trustworthy AI, especially fairness in AI.</p>
+        <p>Outside of work and research, I enjoy novels, films, JRPGs, and Arknights. BTW, I love Chongqing noodles topped with a fried egg, and I strongly recommend that everyone try it.</p>
+        <p>I also share my home with a cat named <span class="pc-cat" lang="zh-CN">紫米<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="lucide lucide-paw-print"><circle cx="11" cy="4" r="2"></circle><circle cx="18" cy="8" r="2"></circle><circle cx="20" cy="16" r="2"></circle><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"></path></svg></span> (pronounced roughly “dzuh-mee”), whose name literally means “purple rice.”</p>
+        <p>I create to give form to my emotions and, hopefully, resonate with others. I’m currently developing an indie game on my own, hoping to share some of those delicate feelings with others someday.</p>
+        <p>Feel free to reach out if you’d like to collaborate or have a coffee chat about my work, research, game development—or even my cat. :)</p></div></main>
+    <blockquote class="pc-quote" lang="zh-CN">“南淮是不是那个南淮都无所谓，可和你偷花跳板子打枣子的人，都已经不在了。”</blockquote>
+  </div>
+</div>
   </body>
 </html>
