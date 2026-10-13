@@ -141,6 +141,8 @@ a { color: inherit; }
   #pinjun-cut-current .pc-email:hover::after { transform: scaleX(1.13); }
   #pinjun-cut-current .pc-email:hover .pc-email-arrow { transform: translate(5px,-4px); }
   #pinjun-cut-current .pc-reading { position: relative; max-width: 730px; padding: 0 50px 0 48px; }
+  /* Main receives focus after navigation; links and buttons keep their rings. */
+  #pinjun-cut-current .pc-reading:focus { outline: none; }
   #pinjun-cut-current .pc-content p + p { margin-top: var(--pc-gap); }
   #pinjun-cut-current .pc-content a {
     color: inherit;
