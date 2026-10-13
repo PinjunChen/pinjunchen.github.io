@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 362 100" fill="#322c31">
+  <title>CHEN</title>
+  <!-- A shared 1:4 cut gives the crossbar ends their 14-degree rake. -->
+  <path d="M80 0H6L0 24V94L24 100H74L80 76H30L24 74.5V30L25.5 24H74Z"/>
+  <path d="M92 0H116V38H148V0H172V100H148V62H116V100H92Z"/>
+  <path d="M184 0H260L254 24H208V38H250L244 62H208V76H260L254 100H184Z"/>
+  <path d="M272 100V0H296L338 62V0H362V100H338L296 38V100Z"/>
+</svg>

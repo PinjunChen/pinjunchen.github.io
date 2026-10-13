@@ -8,8 +8,25 @@
     const art = site.querySelector(".pc-art");
     const design = { canvas: "#faf7f8", blush: "#efe2e7", gap: 20, motion: true, speed: 1, strength: 1 };
     const cycle = 2.8;
+    const mark = new Image();
+    mark.src = new URL("assets/chen-mark.svg?v=20261013",document.currentScript.src).href;
+    const markRatio = 3.62;
+    const grainTile = document.createElement("canvas");
+    grainTile.width = grainTile.height = 128;
+    const grainContext = grainTile.getContext("2d");
+    const grainPixels = grainContext.createImageData(128,128);
+    let grainSeed = 1313;
+    for (let pixel = 0; pixel < grainPixels.data.length; pixel += 4) {
+      grainSeed = (Math.imul(grainSeed,1664525)+1013904223) >>> 0;
+      grainPixels.data[pixel] = 50;
+      grainPixels.data[pixel+1] = 44;
+      grainPixels.data[pixel+2] = 49;
+      grainPixels.data[pixel+3] = grainSeed%7 === 0 ? 12 : 0;
+    }
+    grainContext.putImageData(grainPixels,0,0);
+    const grain = context?.createPattern(grainTile,"repeat");
     let visible = true, frameId = 0, lastTime = 0, elapsed = 0, mode = "idle", lastPointerType = "";
-    let pose = 0, returnFrom = 0, returnElapsed = 0;
+    let pose = 0, returnFrom = 0, returnElapsed = 0, hint = 0, returnHintFrom = 0;
     const returnDuration = .48;
     let width = 0, height = 0, ratio = 1, colors = {}, geometry = {};
 
@@ -45,6 +62,43 @@
       context.fillStyle = fill;
       context.fill();
     }
+    function clipPolygon(points,axis,limit,keepGreater) {
+      const output = [];
+      const inside = point => keepGreater ? point[axis] >= limit : point[axis] <= limit;
+      for (let index = 0; index < points.length; index++) {
+        const a = points[index], b = points[(index+1)%points.length];
+        const aInside = inside(a), bInside = inside(b);
+        if (aInside) output.push(a);
+        if (aInside !== bInside) {
+          const fraction = (limit-a[axis])/(b[axis]-a[axis]);
+          output.push([a[0]+(b[0]-a[0])*fraction,a[1]+(b[1]-a[1])*fraction]);
+        }
+      }
+      return output;
+    }
+    function updateHitArea() {
+      const pad = width <= 560 ? 10 : 28;
+      const halfW = geometry.fontSize*markRatio*.5+pad;
+      const halfH = geometry.fontSize*.5+pad;
+      const cos = Math.cos(geometry.angle), sin = Math.sin(geometry.angle);
+      let points = [[-halfW,-halfH],[halfW,-halfH],[halfW,halfH],[-halfW,halfH]].map(([x,y]) => {
+        const skewedX = x-.09*y;
+        return [geometry.cx+skewedX*cos-y*sin,geometry.cy+skewedX*sin+y*cos];
+      });
+      points = clipPolygon(points,0,geometry.clipX,true);
+      points = clipPolygon(points,0,width,false);
+      points = clipPolygon(points,1,geometry.clipY,true);
+      points = clipPolygon(points,1,geometry.clipY+geometry.clipH,false);
+      const left = Math.min(...points.map(point => point[0]));
+      const top = Math.min(...points.map(point => point[1]));
+      const hitWidth = Math.max(44,Math.max(...points.map(point => point[0]))-left);
+      const hitHeight = Math.max(44,Math.max(...points.map(point => point[1]))-top);
+      art.style.left = left+"px";
+      art.style.top = top+"px";
+      art.style.width = hitWidth+"px";
+      art.style.height = hitHeight+"px";
+      art.style.clipPath = "polygon("+points.map(([x,y]) => `${(x-left)/hitWidth*100}% ${(y-top)/hitHeight*100}%`).join(",")+")";
+    }
     function draw() {
       if (!context || !width || !height) return;
       const w = width, h = height;
@@ -54,8 +108,23 @@
       context.save();
 
       // Matte, intersecting cut planes. No blur, soft shadow, or liquid shape.
-      polygon([[w*(.84-.028*cut),-h*.16],[w*1.18,-h*.16],[w*1.18,h*1.16],[w*(.56+.025*cut),h*1.16]], colors.blush);
-      polygon([[w*(.89+.025*cut),-h*.08],[w*1.12,-h*.08],[w*(.73+.025*cut),h*.72],[w*(.63+.025*cut),h*.56]], colors.plate);
+      const blushPlane = [[w*(.84-.028*cut),-h*.16],[w*1.18,-h*.16],[w*1.18,h*1.16],[w*(.56+.025*cut),h*1.16]];
+      const platePlane = [[w*(.89+.025*cut),-h*.08],[w*1.12,-h*.08],[w*(.73+.025*cut),h*.72],[w*(.63+.025*cut),h*.56]];
+      polygon(blushPlane, colors.blush);
+      polygon(platePlane, colors.plate);
+      if (grain) {
+        context.save();
+        context.beginPath();
+        [blushPlane,platePlane].forEach(points => {
+          points.forEach(([x,y],index) => index ? context.lineTo(x,y) : context.moveTo(x,y));
+          context.closePath();
+        });
+        context.clip();
+        context.fillStyle = grain;
+        context.globalAlpha = .4;
+        context.fillRect(0,0,w,h);
+        context.restore();
+      }
       polygon([[w*(.74-.025*cut),h*.06],[w*1.18,h*.13],[w*1.18,h*.39],[w*(.69-.025*cut),h*.25]], colors.paper);
       polygon([[w*1.15,h*.52],[w*(.73-.018*cut),h*.85],[w*(.71-.018*cut),h*.97],[w*1.12,h*.67]], colors.paper);
 
@@ -67,14 +136,19 @@
       const cx = geometry.cx, cy = geometry.cy;
       const size = geometry.fontSize;
       const angle = geometry.angle + cut * .035;
-      context.font = `900 ${size}px "Arial Black", Arial, sans-serif`;
-      const textWidth = context.measureText("CHEN").width;
+      const textWidth = size*markRatio;
 
       // Two quiet corner marks replace the overlapping spatial wireframes.
       context.save();
       context.translate(cx,cy);
       context.rotate(geometry.angle);
-      const halfW = textWidth*.53, halfH = size*.52, corner = size*.28;
+      const halfW = textWidth*.5+10+hint*3, halfH = size*.5+10+hint*3, corner = size*.24;
+      if (art.matches(":focus-visible")) {
+        context.strokeStyle = colors.accent;
+        context.globalAlpha = .8;
+        context.lineWidth = 1.5;
+        context.strokeRect(-halfW-5,-halfH-5,halfW*2+10,halfH*2+10);
+      }
       context.beginPath();
       context.moveTo(-halfW,-halfH+corner);
       context.lineTo(-halfW,-halfH);
@@ -83,7 +157,7 @@
       context.lineTo(halfW,halfH);
       context.lineTo(halfW-corner,halfH);
       context.strokeStyle = colors.ink;
-      context.globalAlpha = .45;
+      context.globalAlpha = .4+hint*.2;
       context.lineWidth = 1;
       context.stroke();
       context.restore();
@@ -104,12 +178,8 @@
         context.translate(cx+shift,cy);
         context.rotate(angle);
         context.transform(1,0,-.09,1,0,0);
-        context.font = `900 ${size}px "Arial Black", Arial, sans-serif`;
-        context.textAlign = "center";
-        context.textBaseline = "middle";
         context.globalAlpha = .94;
-        context.fillStyle = colors.ink;
-        context.fillText("CHEN",0,0);
+        if (mark.complete && mark.naturalWidth) context.drawImage(mark,-textWidth*.5,-size*.5,textWidth,size);
         context.restore();
       }
       context.restore();
@@ -130,21 +200,18 @@
       const rightPadding = parseFloat(getComputedStyle(reading).paddingRight);
       if (width <= 560) {
         const clipX = email.right-box.left+28;
-        const clipY = email.top-box.top-10;
+        const clipY = email.top-box.top-13;
         const available = width-clipX;
-        const clipH = email.height+22;
-        geometry = { cx: clipX+available*.52, cy: email.top-box.top+email.height*.5, fontSize: Math.min(54,available*.29), angle: -.12, shift: Math.min(9,available*.045), clipX, clipY, clipH, bandTop: clipY, bandHeight: clipH/3 };
+        const clipH = email.height+26;
+        geometry = { cx: clipX+available*.5, cy: email.top-box.top+email.height*.5, fontSize: Math.min(38,available*.247), angle: -.09, shift: Math.min(7,available*.04), clipX, clipY, clipH, bandTop: clipY, bandHeight: clipH/3 };
       } else {
         const clipX = readingBox.right-box.left-rightPadding+26;
         const clipY = email.bottom-box.top+22;
         const available = width-clipX;
         const clipH = Math.max(44,height-clipY);
-        geometry = { cx: clipX+available*.52, cy: clipY+clipH*.5, fontSize: Math.min(available*.63,clipH*.27), angle: -1.34, shift: Math.min(width*.027,available*.08), clipX, clipY, clipH, bandTop: clipY, bandHeight: clipH/3 };
+        geometry = { cx: clipX+available*.52, cy: clipY+clipH*.5, fontSize: Math.min(available*.5,clipH*.235), angle: -1.34, shift: Math.min(width*.027,available*.08), clipX, clipY, clipH, bandTop: clipY, bandHeight: clipH/3 };
       }
-      art.style.left = geometry.clipX+"px";
-      art.style.top = geometry.clipY+"px";
-      art.style.width = Math.max(44,width-geometry.clipX)+"px";
-      art.style.height = geometry.clipH+"px";
+      updateHitArea();
       draw();
     }
     function isRunning() {
@@ -161,7 +228,9 @@
       lastTime = 0;
       elapsed = 0;
       pose = 0;
+      hint = 0;
       returnFrom = 0;
+      returnHintFrom = 0;
       returnElapsed = 0;
       mode = "idle";
       updateArtState();
@@ -181,9 +250,10 @@
     }
     function settle() {
       if (mode === "idle" || mode === "return") return;
-      if (!isRunning() || pose === 0) { stop(); return; }
+      if (!isRunning() || (pose === 0 && hint === 0)) { stop(); return; }
       if (frameId) cancelAnimationFrame(frameId);
       returnFrom = pose;
+      returnHintFrom = hint;
       returnElapsed = 0;
       lastTime = 0;
       mode = "return";
@@ -203,12 +273,14 @@
           returnElapsed += step;
           const progress = Math.min(1,returnElapsed/returnDuration);
           pose = returnFrom*Math.pow(1-progress,3);
+          hint = returnHintFrom*Math.pow(1-progress,3);
           if (progress === 1) { stop(); return; }
         } else {
           elapsed += step;
           if (mode === "once" && elapsed >= cycle) { stop(); return; }
           if (mode === "hover" && elapsed >= cycle) elapsed %= cycle;
           pose = cutAt(elapsed);
+          hint = 1-(1-hint)*Math.exp(-step*25);
         }
         draw();
       }
@@ -228,18 +300,21 @@
     });
     art.addEventListener("pointerleave",() => { if (mode === "hover") settle(); });
     art.addEventListener("pointerdown",event => { lastPointerType = event.pointerType; });
+    art.addEventListener("focus",draw);
     art.addEventListener("click",event => {
       if (event.detail > 0 && lastPointerType !== "touch" && hoverPointer.matches) return;
       if (mode === "once") settle();
       else start("once");
     });
-    art.addEventListener("blur",() => { if (mode === "once") settle(); });
+    art.addEventListener("blur",() => { if (mode === "once") settle(); else draw(); });
     reducedMotion.addEventListener("change",() => requestAnimationFrame(render));
     document.addEventListener("visibilitychange",() => { if (document.hidden) stop(); });
     const sizeObserver = new ResizeObserver(resize);
     sizeObserver.observe(site);
     const visibilityObserver = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (!visible) stop(); });
     visibilityObserver.observe(site);
+    mark.addEventListener("load",() => { site.dataset.markReady = "true"; resize(); });
+    if (mark.complete && mark.naturalWidth) site.dataset.markReady = "true";
     render();
     resize();
 

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <g id="chen" fill="#322c31">
+      <path d="M80 0H6L0 24V94L24 100H74L80 76H30L24 74.5V30L25.5 24H74Z"/>
+      <path d="M92 0H116V38H148V0H172V100H148V62H116V100H92Z"/>
+      <path d="M184 0H260L254 24H208V38H250L244 62H208V76H260L254 100H184Z"/>
+      <path d="M272 100V0H296L338 62V0H362V100H338L296 38V100Z"/>
+    </g>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="2" seed="13"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".028"/></feComponentTransfer>
+    </filter>
+    <clipPath id="planes"><path d="M888-100H1400V800H594Z"/></clipPath>
+  </defs>
+  <rect width="1200" height="630" fill="#faf7f8"/>
+  <path d="M888-100H1400V800H594Z" fill="#efe2e7"/>
+  <path d="M1032-60H1400L876 475L756 352Z" fill="#e2ccd6"/>
+  <rect width="1200" height="630" clip-path="url(#planes)" filter="url(#grain)"/>
+  <path d="M864 39L1416 82V246L804 156Z" fill="#fffcfd"/>
+  <path d="M1380 328L852 535L828 611L1344 422Z" fill="#fffcfd"/>
+  <text x="64" y="262" fill="#322c31" font-family="Arial Black,Segoe UI,Arial,sans-serif" font-size="68" font-weight="900" letter-spacing="-3.4">Pinjun Chen</text>
+  <path d="M68 300H189" stroke="#322c31" stroke-width="2"/>
+  <use href="#chen" transform="translate(988 362) rotate(-76.8) skewX(-5.15) scale(1.22) translate(-181 -50)"/>
+</svg>
